@@ -122,4 +122,14 @@ app.get("/janken2", (req, res) => {
   });
 });
 
+let monsters = [
+  { id: 1, name: "リオレウス", weakness: "龍" },
+  { id: 2, name: "リオレイア", weakness: "龍" },
+  { id: 3, name: "ディアブロス", weakness: "氷" },
+];
+
+app.get("/monsters", (req, res) => {
+  res.render("monsters", { data: monsters });
+});
+
 app.listen(8080, () => console.log("Example app listening on port 8080!"));
