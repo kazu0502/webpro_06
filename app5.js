@@ -132,4 +132,15 @@ app.get("/monsters", (req, res) => {
   res.render("monsters", { data: monsters });
 });
 
+app.get("/monster_add", (req, res) => {
+  let id = req.query.id;
+  let name = req.query.name;
+  let weakness = req.query.weakness;
+
+  let newdata = { id: id, name: name, weakness: weakness };
+  monsters.push(newdata);
+
+  res.render("monsters", { data: monsters });
+});
+
 app.listen(8080, () => console.log("Example app listening on port 8080!"));
