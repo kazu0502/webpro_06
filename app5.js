@@ -128,6 +128,17 @@ app.post("/keiyo2/update/:number", (req, res) => {
   res.redirect("/keiyo2");
 });
 
+app.post("/keiyo2/delete/:number", (req, res) => {
+  const number = Number(req.params.number);
+
+  if (!Number.isInteger(number) || number < 0 || number >= station2.length) {
+    return res.status(404).send("指定された駅は見つかりません。");
+  }
+
+  station2.splice(number, 1);
+  res.redirect("/keiyo2");
+});
+
 app.get("/keiyo2/:number", (req, res) => {
   const number = Number(req.params.number);
 

@@ -97,15 +97,18 @@ MHXXを遊ぶ利用者が、モンスターと武器の情報を確認し、自�
 
 ```mermaid
 flowchart LR
-    H[トップページ] -->|3つのシステムから選択| A
-    A[一覧ページ] -->|名前を選択| B[詳細ページ]
+    H["トップページ<br/>GET /mhxx"] -->|3つのシステムから選択| A
+    A["一覧ページ<br/>GET /mhxx/{resource}"] -->|名前を選択| B["詳細ページ<br/>GET /mhxx/{resource}/:id"]
     B -->|一覧に戻る| A
-    A -->|新規登録| C[追加フォーム]
-    C -->|登録| A
-    B -->|編集| D[変更フォーム]
-    D -->|保存| B
+    A -->|新規登録| C["追加フォーム<br/>GET /mhxx/{resource}/new"]
+    C -->|登録| P["新規登録処理<br/>POST /api/mhxx/{resource}"]
+    P -->|登録成功| A
+    B -->|編集| D["変更フォーム<br/>GET /mhxx/{resource}/:id/edit"]
+    D -->|保存| U["更新処理<br/>PUT /api/mhxx/{resource}/:id"]
+    U -->|更新成功| B
     B -->|削除を選択| E{削除を確認}
-    E -->|削除する| A
+    E -->|削除する| X["削除処理<br/>DELETE /api/mhxx/{resource}/:id"]
+    X -->|削除成功| A
     E -->|キャンセル| B
 ```
 

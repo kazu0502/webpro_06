@@ -18,6 +18,10 @@
   </table>
 
   <a href="/keiyo2/edit/<%= number %>">編集</a>
+  <form action="/keiyo2/delete/<%= number %>" method="post"
+      onsubmit="return confirm('この駅を削除しますか？');">
+  <button type="submit">削除</button>
+</form>
   <a href="/keiyo2">駅一覧に戻る</a>
 </body>
 </html>
