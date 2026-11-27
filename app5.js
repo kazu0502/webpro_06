@@ -3,6 +3,7 @@ const app = express();
 
 app.set('view engine', 'ejs');
 app.use("/public", express.static(__dirname + "/public"));
+app.use(express.urlencoded({ extended: true }));
 
 let station = [
   { id: 1, code: "JE01", name: "東京駅" },
@@ -43,10 +44,18 @@ app.get("/keiyo2", (req, res) => {
 });
 
 app.get("/keiyo2_add", (req, res) => {
-  const { id, code, name, change = "", passengers, distance } = req.query;
+  res.redirect("/keiyo2/create");
+});
+
+app.get("/keiyo2/create", (req, res) => {
+  res.redirect("/public/keiyo2_add.html");
+});
+
+app.post("/keiyo2", (req, res) => {
+  const { code, name, change = "", passengers, distance } = req.body;
 
   if (
-    ![id, code, name, passengers, distance].every(value =>
+    ![code, name, passengers, distance].every(value =>
       typeof value === "string" && value.trim() !== ""
     ) || typeof change !== "string"
   ) {
@@ -54,7 +63,7 @@ app.get("/keiyo2_add", (req, res) => {
   }
 
   const newdata = {
-    id: Number(id),
+    id: Math.max(0, ...station2.map(row => row.id)) + 1,
     code: code.trim(),
     name: name.trim(),
     change: change.trim(),
@@ -63,18 +72,59 @@ app.get("/keiyo2_add", (req, res) => {
   };
 
   if (
-    !Number.isInteger(newdata.id) || newdata.id < 1 ||
     !Number.isInteger(newdata.passengers) || newdata.passengers < 0 ||
     !Number.isFinite(newdata.distance) || newdata.distance < 0
   ) {
-    return res.status(400).send("IDは正の整数、乗降客数は0以上の整数、距離は0以上の数値を入力してください。");
-  }
-
-  if (station2.some(row => row.id === newdata.id)) {
-    return res.status(400).send("そのIDはすでに使われています。別のIDを入力してください。");
+    return res.status(400).send("乗降客数は0以上の整数、距離は0以上の数値を入力してください。");
   }
 
   station2.push(newdata);
+  res.redirect("/keiyo2");
+});
+
+app.get("/keiyo2/edit/:number", (req, res) => {
+  const number = Number(req.params.number);
+
+  if (!Number.isInteger(number) || number < 0 || number >= station2.length) {
+    return res.status(404).send("指定された駅は見つかりません。");
+  }
+
+  res.render("keiyo2_edit", { number: number, data: station2[number] });
+});
+
+app.post("/keiyo2/update/:number", (req, res) => {
+  const number = Number(req.params.number);
+
+  if (!Number.isInteger(number) || number < 0 || number >= station2.length) {
+    return res.status(404).send("指定された駅は見つかりません。");
+  }
+
+  const { code, name, change = "", passengers, distance } = req.body;
+
+  if (
+    ![code, name, passengers, distance].every(value =>
+      typeof value === "string" && value.trim() !== ""
+    ) || typeof change !== "string"
+  ) {
+    return res.status(400).send("必要な項目を入力してください。");
+  }
+
+  const updatedData = {
+    code: code.trim(),
+    name: name.trim(),
+    change: change.trim(),
+    passengers: Number(passengers),
+    distance: Number(distance)
+  };
+
+  if (
+    !Number.isInteger(updatedData.passengers) || updatedData.passengers < 0 ||
+    !Number.isFinite(updatedData.distance) || updatedData.distance < 0
+  ) {
+    return res.status(400).send("乗降客数は0以上の整数、距離は0以上の数値を入力してください。");
+  }
+
+  Object.assign(station2[number], updatedData);
   res.redirect("/keiyo2");
 });
 
@@ -86,7 +136,7 @@ app.get("/keiyo2/:number", (req, res) => {
   }
 
   const detail = station2[number];
-  res.render("keiyo2_detail", { data: detail });
+  res.render("keiyo2_detail", { number: number, data: detail });
 });
 
 app.get("/hello1", (req, res) => {

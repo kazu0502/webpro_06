@@ -7,11 +7,9 @@
 <body>
   <h2>京葉線の駅を追加する</h2>
 
-  <form action="/keiyo2_add" method="get">
-    <p>
-      <label for="id">ID</label>
-      <input type="number" name="id" id="id" min="1" step="1" required>
-    </p>
+  <p>IDは登録時に自動で割り当てます。</p>
+
+  <form action="/keiyo2" method="post">
     <p>
       <label for="code">駅コード</label>
       <input type="text" name="code" id="code" required>
